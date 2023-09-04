@@ -1,14 +1,16 @@
 const express = require('express')
 
-const TaskController = require('../controllers/task')
 const checkAuth = require('../middleware/check-auth');
+const TaskController = require('../controllers/task')
 
 const router = express.Router();
 
 router.get('/getTasks',
+checkAuth,
 TaskController.getTasks
 )
 router.get('/getTask/:id',
+checkAuth,
 TaskController.getTaskById
 )
 router.post('/addTask',

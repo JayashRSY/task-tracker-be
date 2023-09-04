@@ -1,22 +1,14 @@
 const Task = require('../models/task');
 
 exports.getTasks = (req, res, next) => {
-    // const pageSize = +req.query.pagesize
-    // const currentPage = +req.query.page
-    // let fetchedTasks;
-    // const taskQuery = Task.find();
-    // if (pageSize && currentPage) {
-    //     taskQuery.skip(pageSize * (currentPage - 1)).limit(pageSize)
-    // }
-    Task.find().then(documents => {
-        fetchedTasks = documents
-        return Task.count()
-    }).then(count => {
-        res.status(200).json({
-            message: "Tasks fetched successfully",
-            tasks: fetchedTasks,
-            maxTasks: count
-        })
+    Task.find({ creator: req.userData.email }).then(task => {
+        if (task) {
+            res.status(200).json(task)
+        } else {
+            res.status(404).json({
+                message: 'Task not found'
+            })
+        }
     })
 }
 exports.getTaskById = (req, res, next) => {
@@ -37,7 +29,7 @@ exports.createTask = (req, res, next) => {
         dueDate: req.body.dueDate,
         priority: req.body.priority,
         status: req.body.status,
-        creator: req.userData.userId
+        creator: req.userData.email
     })
     task.save().then((createdTask) => {
         res.status(201).json({
@@ -51,7 +43,7 @@ exports.createTask = (req, res, next) => {
 }
 
 exports.deleteTask = (req, res, next) => {
-    Task.deleteOne({ _id: req.params.id, creator: req.userData.userId })
+    Task.deleteOne({ _id: req.params.id, creator: req.userData.email })
         .then((result) => {
             if (result.deletedCount > 0) {
                 res.status(200).json({ message: 'Task Deleted successfully' })
@@ -62,19 +54,16 @@ exports.deleteTask = (req, res, next) => {
 }
 
 exports.updateTask = (req, res, next) => {
-    let imagePath = req.body.imagePath
-    // if (req.file) {
-    //     const url = req.protocol + '://' + req.get("host")
-    //     imagePath = url + "/images/" + req.file.filename
-    // }
     const task = new Task({
         _id: req.params.id,
         title: req.body.title,
-        content: req.body.content,
-        imagePath: imagePath,
-        creator: req.userData.userId
+        description: req.body.description,
+        dueDate: req.body.dueDate,
+        priority: req.body.priority,
+        status: req.body.status,
+        creator: req.userData.email
     })
-    Task.updateOne({ _id: req.params.id, creator: req.userData.userId }, task)
+    Task.updateOne({ _id: req.params.id, creator: req.userData.email }, task)
         .then(result => {
             if (result.matchedCount > 0) {
                 res.status(200).json({ message: 'Task updated successfully' })
