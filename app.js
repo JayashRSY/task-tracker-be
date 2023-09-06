@@ -14,7 +14,7 @@ const colors = require('colors')
 const app = express()
 
 const corsOptions = {
-    origin: 'https://task-tracker-fe-mu.vercel.app', // Replace with your actual frontend domain
+    origin: ['https://task-tracker-fe-mu.vercel.app', 'http://localhost:4200'], // Replace with your actual frontend domain
     // origin: 'http://localhost:4200', // Replace with your actual frontend domain
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true, // If you are using cookies or sessions
